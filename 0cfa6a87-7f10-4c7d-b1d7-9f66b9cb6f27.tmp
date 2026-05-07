@@ -1,0 +1,65 @@
+﻿#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+#define ALPHABET_SIZE 26
+
+// Trie Düğüm Yapısı
+struct TrieNode {
+    struct TrieNode* children[ALPHABET_SIZE];
+    bool isEndOfWord; // Kelimenin bittiği yer
+};
+
+// Yeni bir düğüm oluşturma fonksiyonu
+struct TrieNode* createNode(void) {
+    struct TrieNode* newNode = (struct TrieNode*)malloc(sizeof(struct TrieNode));
+    newNode->isEndOfWord = false;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        newNode->children[i] = NULL;
+    }
+    return newNode;
+}
+
+// Kelime ekleme fonksiyonu
+void insert(struct TrieNode* root, const char* key) {
+    struct TrieNode* pCrawl = root;
+    for (int i = 0; i < strlen(key); i++) {
+        int index = key[i] - 'a'; // 'a' karakterini 0 bazlı indexe çevirir
+        if (!pCrawl->children[index]) {
+            pCrawl->children[index] = createNode();
+        }
+        pCrawl = pCrawl->children[index];
+    }
+    pCrawl->isEndOfWord = true;
+}
+
+// Kelime arama fonksiyonu
+bool search(struct TrieNode* root, const char* key) {
+    struct TrieNode* pCrawl = root;
+    for (int i = 0; i < strlen(key); i++) {
+        int index = key[i] - 'a';
+        if (!pCrawl->children[index]) {
+            return false;
+        }
+        pCrawl = pCrawl->children[index];
+    }
+    return (pCrawl != NULL && pCrawl->isEndOfWord);
+}
+
+int main() {
+    struct TrieNode* root = createNode();
+
+    // Kelime ekleme örnekleri
+    insert(root, "abc");
+    insert(root, "trt");
+    insert(root, "tri");
+    insert(root, "tre");
+
+    // Arama testleri
+    printf("abc arama sonucu: %s\n", search(root, "abc") ? "Bulundu" : "Bulunamadi");
+    printf("trie arama sonucu: %s\n", search(root, "trie") ? "Bulundu" : "Bulunamadi");
+    printf("trt arama sonucu: %s\n", search(root, "trt") ? "Bulundu" : "Bulunamadi");
+
+    return 0;
+}
